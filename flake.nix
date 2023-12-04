@@ -1,21 +1,25 @@
 {
   description = "A simple repackaging of grlx with Nix";
 
-  inputs = { nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable"; };
+  inputs = { 
+     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable"; 
+  };
 
   outputs = inputs@{ flake-parts, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
       imports = [
-        # To import a flake module
-        # 1. Add foo to inputs
-        # 2. Add foo as a parameter to the outputs function
-        # 3. Add here: foo.flakeModule
       ];
-      systems =
-        [ "x86_64-linux" "aarch64-linux" "aarch64-darwin" "x86_64-darwin" ];
+      systems = [
+        "i686-linux"
+        "x86_64-linux"
+        "aarch64-linux"
+        "aarch64-darwin"
+        "x86_64-darwin"
+      ];
       perSystem = { config, self', inputs', pkgs, system, ... }:
         let
           version = "1.0.0";
+          binaryVersion = "1.0.0";
           shortCommit = "c8745ea";
           # TODO: Add filterSource to pkgs to ignore testing directories
           grlx-src = pkgs.fetchFromGitHub {
@@ -29,6 +33,22 @@
             "-X main.Tag=${grlx-src.rev}"
             "-X main.GitCommit=${shortCommit}"
           ];
+
+          convertSystem = system:
+            if system == "x86_64-linux" then
+              "linux-amd64"
+            else if system == "x86_64-darwin" then
+              "darwin-amd64"
+            else if system == "aarch64-linux" then
+              "linux-arm64"
+            else if system == "aarch64-darwin" then
+              "darwin-arm64"
+            else if system == "i686-linux" then
+              "linux-386"
+            else
+              abort "Unsupported system ${system}";
+          converted = convertSystem system;
+
           buildGrlxPackage = { name, subPackages, }:
             pkgs.buildGoModule {
               inherit name version vendorHash subPackages ldflags;
@@ -40,6 +60,23 @@
                 maintainer = with maintainers; [ ethanholz ];
               };
             };
+          grlxBinary = pkgs.stdenv.mkDerivation {
+            name = "grlx";
+            inherit version;
+            src = pkgs.fetchurl {
+              url =
+                "https://github.com/gogrlx/grlx/releases/download/v${binaryVersion}/grlx-v${binaryVersion}-${converted}";
+              hash = "sha256-z3JeIWyhIybCE4JA7ugqX9InCZ8eGeTJ8oArecaJToo=";
+            };
+            dontUnpack = true;
+            installPhase = ''
+              ls -la $src
+              mkdir -p $out/bin/
+                cp -v $src $out/bin/grlx 
+              chmod 755 $out/bin/grlx
+            '';
+          };
+
           buildGrlxContainer = { name, package, tag, }:
             pkgs.dockerTools.buildImage {
               inherit name tag;
@@ -57,7 +94,7 @@
             subPackages = [ "cmd/grlx" "cmd/farmer" "cmd/sprout" ];
           };
           grlx-cli = buildGrlxPackage {
-            name = "grlx-cli";
+            name = "grlx";
             subPackages = [ "cmd/grlx" ];
           };
           grlx-farmer = buildGrlxPackage {
@@ -87,8 +124,9 @@
           packages = {
             inherit grlx-farmer grlx-sprout grlx-cli grlx-farmer-docker
               grlx-sprout-docker;
-            default = grlx-cli;
+            default = grlxBinary;
             all = grlx;
+            grlx-binary = grlxBinary;
           };
 
           formatter = pkgs.nixfmt;
