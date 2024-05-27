@@ -68,7 +68,7 @@
             };
           };
         # TODO: we need to fix this to handle all binary versions as this looks to only be on binary version.
-        grlxBinary = pkgs.stdenv.mkDerivation {
+        grlxBinary = pkgs.stdenvNoCC.mkDerivation {
           name = "grlx";
           inherit version;
           src = pkgs.fetchurl {
