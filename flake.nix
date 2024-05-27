@@ -31,7 +31,7 @@
           rev = "v${version}";
           hash = "sha256-HmON/iX8NGu2LKThYt2694ko91CrjRcq3iZP8XqX7O8=";
         };
-        vendorHash = "";
+        vendorHash = "sha256-tPVQjTDeECq3x1ylTN4TgMxe2uIuIdreCtlTxuqQ/4k=";
         ldflags = [
           "-X main.Tag=${grlx-src.rev}"
           "-X main.GitCommit=${shortCommit}"
