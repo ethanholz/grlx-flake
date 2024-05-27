@@ -1,0 +1,24 @@
+name: Validate Nix Flake
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  strategy:
+    matrix:
+      os: [ubuntu-latest, macos-latest]
+  archive-download-check:
+    name: Run the archive download tests for ${{matrix.os}}
+    runs-on: ${{matrix.os}}
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4 
+      - name: Install nix
+        uses: DeterminateSystems/nix-installer-action@main
+      - name: Run build
+        run: nix build -L .#default
+
