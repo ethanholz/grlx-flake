@@ -1,0 +1,27 @@
+[
+  {
+    "hash": "129nzz9m2nfpjdh5bjx0j8pxqxjiiqcmxdhnaimqvgkdcs4r0j44",
+    "binary_system": "linux-amd64",
+    "name": "x86_64-linux"
+  },
+  {
+    "hash": "09yd4ljbm0zl4fzhn7vmhl3aq68llfb1zfg1jvqx9vmccvlypcy7",
+    "binary_system": "linux-386",
+    "name": "i686-linux"
+  },
+  {
+    "hash": "090k9cxf383xzm4bcknbhjyihlkkriwcf0salk98vmql08yx5m52",
+    "binary_system": "linux-arm64",
+    "name": "aarch64-linux"
+  },
+  {
+    "hash": "1j5kv3a38zad1idsg0mm8qabxnh0mzcy8p9ln3l3l8r0jy7m2kam",
+    "binary_system": "darwin-amd64",
+    "name": "x86_64-darwin"
+  },
+  {
+    "hash": "1j6k0f5qfiya5c8jk1a1bhn1x014nrbknfa2gsddnny436lr9wdg",
+    "binary_system": "darwin-arm64",
+    "name": "aarch64-darwin"
+  }
+]

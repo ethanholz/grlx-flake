@@ -21,55 +21,41 @@
         system,
         ...
       }: let
-        version = "1.0.3";
-        binaryVersion = "1.0.3";
-        shortCommit = "b08e2e8";
+        version = "1.0.4";
+        binaryVersion = "1.0.4";
+        shortCommit = "42a8b65";
         # TODO: Add filterSource to pkgs to ignore testing directories
         grlx-src = pkgs.fetchFromGitHub {
           owner = "gogrlx";
           repo = "grlx";
           rev = "v${version}";
-          hash = "sha256-bfECj03gTC9gM9ei9Ewa3+c+XUrfahYW7OGnxzQ2QWg=";
+          hash = "sha256-HmON/iX8NGu2LKThYt2694ko91CrjRcq3iZP8XqX7O8=";
         };
         vendorHash = "";
         ldflags = [
           "-X main.Tag=${grlx-src.rev}"
           "-X main.GitCommit=${shortCommit}"
         ];
+        convertSystemNew = system:
+        let
+            jsonString = builtins.readFile ./grlx.json;
+            jsonData = builtins.fromJSON jsonString;
+            matches = item: item.name == system;
+            matched = builtins.filter matches jsonData;
+            result = if builtins.length matched > 0 then let
+                matchedItem = builtins.head matched;
+            in {
+                system = matchedItem.binary_system;
+                hash = matchedItem.hash;
+            } else abort "Unsupported system ${system}";
+        in
+            result;
 
-        convertSystem = system:
-          if system == "x86_64-linux"
-          then {
-            system = "linux-amd64";
-            hash = "sha256-rJUTp0bZmCS1W8s3ajkvPZ5pZ5DNuD+CJ9tcp/Jg3sk=";
-          }
-          else if system == "x86_64-darwin"
-          then {
-            system = "darwin-amd64";
-            hash = "sha256-yrpWtt3tZqCxaRmJzEfknCYw4G8nIIQio5IXT0kSg4A=";
-          }
-          else if system == "aarch64-linux"
-          then {
-            system = "linux-arm64";
-            hash = "sha256-PaQ74f6qERxCIwBW4LAAEUZktaiWhzw/lqNunOt3ab8=";
-          }
-          else if system == "aarch64-darwin"
-          then {
-            system = "darwin-arm64";
-            hash = "sha256-yMMxtrNXeENXMuYs96peod6ARZLH0C/8M5qK2Yl7BUo=";
-          }
-          else if system == "i686-linux"
-          then {
-            system = "linux-386";
-            hash = "sha256-I4qSC/zuDXt6p0KTusHml2agJ7izMG2Y4IZ9E7BzdrE=";
-          }
-          else abort "Unsupported system ${system}";
-        converted = convertSystem system;
+        converted = convertSystemNew system;
 
         buildGrlxPackage = {
           name,
           subPackages,
-          converted,
         }:
           pkgs.buildGoModule {
             inherit name version vendorHash subPackages ldflags;
@@ -93,7 +79,7 @@
           installPhase = ''
             ls -la $src
             mkdir -p $out/bin/
-              cp -v $src $out/bin/grlx
+            cp -v $src $out/bin/grlx
             chmod 755 $out/bin/grlx
           '';
         };
@@ -157,6 +143,12 @@
           default = grlxBinary;
           all = grlx;
           grlx-binary = grlxBinary;
+        };
+
+        devShells = {
+          default = pkgs.mkShell {
+            buildInputs = [grlxBinary];
+          };
         };
 
         formatter = pkgs.alejandra;
