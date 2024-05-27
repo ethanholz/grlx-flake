@@ -8,10 +8,10 @@ on:
   workflow_dispatch:
 
 jobs:
-  strategy:
-    matrix:
-      os: [ubuntu-latest, macos-latest]
   archive-download-check:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
     name: Run the archive download tests for ${{matrix.os}}
     runs-on: ${{matrix.os}}
     steps:
