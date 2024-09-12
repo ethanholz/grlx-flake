@@ -21,3 +21,5 @@ jobs:
         uses: DeterminateSystems/nix-installer-action@main
       - name: Run build
         run: nix build -L .#default
+      - name: Check version
+        run: ./result/bin/grlx --version
