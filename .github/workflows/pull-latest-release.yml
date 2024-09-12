@@ -1,0 +1,38 @@
+name: Get latest release
+
+on:
+  workflow_dispatch:
+
+jobs:
+  check_release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check for latest release from target repo
+        id: check_release
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const owner = 'gogrlx';  // Target repo owner
+            const repo = 'grlx';     // Target repo name
+            const latestRelease = await github.repos.getLatestRelease({ owner, repo });
+
+            const releaseTag = latestRelease.data.tag_name;
+            console.log(`Latest release: ${releaseTag}`);
+
+            // Read the current JSON file
+            const fs = require('fs');
+            const path = './grlx.json';  // Update with the path to your file
+            const currentData = JSON.parse(fs.readFileSync(path, 'utf8'));
+
+            // Check if the release is new
+            if (!currentData[releaseTag]) {
+              console.log('New release detected:', releaseTag);
+              return releaseTag;  // This output will be used in the next steps
+            } else {
+              console.log('No new release.');
+              return null;
+            }
