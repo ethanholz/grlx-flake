@@ -17,41 +17,8 @@
         pkgs,
         system,
         ...
-      }: let
-        getGrlxPackage = {
-          version,
-        }: let
-          jsonString = builtins.readFile ./grlx.json;
-          jsonData = builtins.fromJSON jsonString;
-          matched = jsonData.${version};
-          result = {
-              url = matched.${system}.url;
-              hash = matched.${system}.hash;
-            };
-        in
-          pkgs.stdenvNoCC.mkDerivation {
-            name = "grlx-${version}";
-            inherit version;
-            src = pkgs.fetchurl {
-              url = result.url;
-              sha256 = result.hash;
-            };
-            dontUnpack = true;
-            installPhase = ''
-              ls -la $src
-              mkdir -p $out/bin/
-              cp -v $src $out/bin/grlx
-              chmod 755 $out/bin/grlx
-            '';
-          };
-      in {
-        packages = {
-            default = getGrlxPackage{version = "v1.0.5";};
-            "v1.0.5" = getGrlxPackage{version = "v1.0.5";};
-            "v1.0.4" = getGrlxPackage{version = "v1.0.4";};
-            "v1.0.3" = getGrlxPackage{version = "v1.0.3";};
-            "v1.0.0" = getGrlxPackage{version = "v1.0.0";};
-        };
+      }: {
+        packages = import ./default.nix {inherit system pkgs;};
 
         devShells = {
           default = pkgs.mkShell {

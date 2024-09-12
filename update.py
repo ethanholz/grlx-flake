@@ -43,6 +43,7 @@ def main():
         print(f"Hash {prefetch_hash} for system {system}")
         res = {}
         res["hash"] = prefetch_hash
+        res["version"] = version
         res["url"] = url
         item[systems[system]] = res
     outs[version] = item
