@@ -21,6 +21,7 @@ jobs:
         id: check_release
         uses: actions/github-script@v6
         with:
+          result-encoding: string
           script: |
             const owner = 'gogrlx';  // Target repo owner
             const repo = 'grlx';     // Target repo name
