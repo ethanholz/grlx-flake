@@ -28,25 +28,23 @@ jobs:
 
             const releaseTag = latestRelease.data.tag_name;
             console.log(`Latest release: ${releaseTag}`);
-            return releaseTag
 
             // Read the current JSON file
-            // const fs = require('fs');
-            // const path = './grlx.json';  // Update with the path to your file
-            // const currentData = JSON.parse(fs.readFileSync(path, 'utf8'));
+            const fs = require('fs');
+            const path = './grlx.json';  // Update with the path to your file
+            const currentData = JSON.parse(fs.readFileSync(path, 'utf8'));
 
             // Check if the release is new
-            // if (!currentData[releaseTag]) {
-            //   console.log('New release detected:', releaseTag);
-            //   return releaseTag;  // This output will be used in the next steps
-            // } else {
-            //   console.log('No new release.');
-            //   return null;
-            // }
-      - name: Remove the old one
-        run: rm grlx.json
+            if (!currentData[releaseTag]) {
+              console.log('New release detected:', releaseTag);
+              return releaseTag;  // This output will be used in the next steps
+            } else {
+              console.log('No new release.');
+              return null;
+            }
       - name: Update
+        if: steps.check_release.outputs.result != null
         run: python update.py ${{steps.check_release.outputs.result}}
-      - name: Print the new one
+      - name: Print the grlx.json
         run: cat grlx.json
 
