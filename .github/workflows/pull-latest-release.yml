@@ -11,6 +11,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Install nix
+        uses: DeterminateSystems/nix-installer-action@main
+
       - name: Install python
         uses: actions/setup-python@v5
 
