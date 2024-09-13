@@ -29,7 +29,6 @@ jobs:
 
             const releaseTag = latestRelease.data.tag_name;
             console.log(`Latest release: ${releaseTag}`);
-            return releaseTag
 
             // Read the current JSON file
             const fs = require('fs');
@@ -42,13 +41,13 @@ jobs:
               return releaseTag;  // This output will be used in the next steps
             } else {
               console.log('No new release.');
-              return null;
+              return "";
             }
       - name: Update
-        if: steps.check_release.outputs.result != null
+        if: ${{steps.check_release.outputs.result != ''}}
         run: python update.py ${{steps.check_release.outputs.result}}
       - name: Is null
-        if: steps.check_release.outputs.result == null
+        if: ${{steps.check_release.outputs.result == ''}}
         run: echo ${{steps.check_release.outputs.result}}
       - name: Print the grlx.json
         run: cat grlx.json
