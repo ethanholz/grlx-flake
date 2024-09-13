@@ -46,9 +46,6 @@ jobs:
       - name: Update
         if: ${{steps.check_release.outputs.result != ''}}
         run: python update.py ${{steps.check_release.outputs.result}}
-      - name: Is null
-        if: ${{steps.check_release.outputs.result == ''}}
-        run: echo ${{steps.check_release.outputs.result}}
       - name: Print the grlx.json
         run: cat grlx.json
 
