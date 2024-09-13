@@ -11,8 +11,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install nix
-        uses: DeterminateSystems/nix-installer-action@main
+      - name: Install python
+        uses: actions/setup-python@v5
 
       - name: Check for latest release from target repo
         id: check_release
@@ -43,7 +43,7 @@ jobs:
       - name: Remove the old one
         run: rm grlx.json
       - name: Update
-        run: nix develop -c python3 update.py
+        run: python update.py ${{steps.check_release.outputs.result}}
       - name: Print the new one
         run: cat grlx.json
 
