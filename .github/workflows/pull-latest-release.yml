@@ -11,11 +11,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Install nix
+        uses: DeterminateSystems/nix-installer-action@main
+
       - name: Check for latest release from target repo
         id: check_release
         uses: actions/github-script@v6
         with:
-          result-encoding: string
           script: |
             const owner = 'gogrlx';  // Target repo owner
             const repo = 'grlx';     // Target repo name
@@ -23,17 +25,25 @@ jobs:
 
             const releaseTag = latestRelease.data.tag_name;
             console.log(`Latest release: ${releaseTag}`);
+            return releaseTag
 
             // Read the current JSON file
-            const fs = require('fs');
-            const path = './grlx.json';  // Update with the path to your file
-            const currentData = JSON.parse(fs.readFileSync(path, 'utf8'));
+            // const fs = require('fs');
+            // const path = './grlx.json';  // Update with the path to your file
+            // const currentData = JSON.parse(fs.readFileSync(path, 'utf8'));
 
             // Check if the release is new
-            if (!currentData[releaseTag]) {
-              console.log('New release detected:', releaseTag);
-              return releaseTag;  // This output will be used in the next steps
-            } else {
-              console.log('No new release.');
-              return null;
-            }
+            // if (!currentData[releaseTag]) {
+            //   console.log('New release detected:', releaseTag);
+            //   return releaseTag;  // This output will be used in the next steps
+            // } else {
+            //   console.log('No new release.');
+            //   return null;
+            // }
+      - name: Remove the old one
+        run: rm grlx.json
+      - name: Update
+        run: nix develop -c python3 update.py
+      - name: Print the new one
+        run: cat grlx.json
+
