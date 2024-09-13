@@ -15,10 +15,11 @@ jobs:
         id: check_release
         uses: actions/github-script@v6
         with:
+          result-encoding: string
           script: |
             const owner = 'gogrlx';  // Target repo owner
             const repo = 'grlx';     // Target repo name
-            const latestRelease = await github.repos.getLatestRelease({ owner, repo });
+            const latestRelease = await github.repos.rest.getLatestRelease({ owner, repo });
 
             const releaseTag = latestRelease.data.tag_name;
             console.log(`Latest release: ${releaseTag}`);
