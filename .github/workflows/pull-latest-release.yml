@@ -29,6 +29,7 @@ jobs:
 
             const releaseTag = latestRelease.data.tag_name;
             console.log(`Latest release: ${releaseTag}`);
+            return releaseTag
 
             // Read the current JSON file
             const fs = require('fs');
