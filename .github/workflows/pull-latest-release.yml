@@ -43,7 +43,7 @@ jobs:
               return null;
             }
       - name: Update
-        if: ${{steps.check_release.outputs.result}} != false
+        if: steps.check_release.outputs.result != "null"
         run: python update.py ${{steps.check_release.outputs.result}}
       - name: Print the grlx.json
         run: cat grlx.json
