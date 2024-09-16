@@ -2,10 +2,16 @@ name: Get latest release
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: "0 14 * * *"
+  
 
 jobs:
   check_release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
 
     steps:
       - name: Checkout repository
@@ -48,4 +54,9 @@ jobs:
         run: python update.py ${{steps.check_release.outputs.result}}
       - name: Print the grlx.json
         run: cat grlx.json
-
+      - name: Create PR of new version
+        if: ${{steps.check_release.outputs.result != ''}}
+        uses: peter-evans/create-pull-request@v7
+        with:
+          title: Add ${{steps.check_release.outputs.result}} 
+          commit-message: 'feat: add ${{steps.check_release.outputs.result}}'
